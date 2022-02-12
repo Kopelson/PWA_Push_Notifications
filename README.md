@@ -3,6 +3,16 @@
 Tutorial playlist on PWA's, by Google Chrome Developers:
 https://www.youtube.com/playlist?list=PLNYkxOF6rcIB2xHBZ7opgc2Mv009X87Hh
 
+*** 
+Special note about create-react-app, you need to use the service worker template if you want to include it in create-react-app
+
+```
+npx create-react-app my-app --template cra-template-pwa
+```
+
+https://stackoverflow.com/questions/65060150/not-getting-service-worker-with-create-react-app
+***
+
 ## Service Workers
 
 ### What is a service worker?
@@ -14,64 +24,62 @@ https://www.youtube.com/playlist?list=PLNYkxOF6rcIB2xHBZ7opgc2Mv009X87Hh
 
 ### Register the Service Worker
 
-    inside main.js
-
-   ```
-
-   if(!('serviceWorker' in navigator)) {
-        console.log('Service Worker not supported');
-        return;
-    }
-    navigator.serviceWorker.register('/service-worker.js)
-        .then(function(registration){
-            console.log('SW registered! Scope is:'), registration.scope);
-        }); //.catch a registration error
-
-    ```
-        
-
-    This should sit in the root js file to cover the scope of the whole app.
-
-    inside sw.js
-
-
-    ```
-    
-    const cacheName = 'cache-v1';
-    const resourcesToPrecache = [
-        '/',
-        'index.html'
-    ];
-
-    self.addEventListener('install', event => {
-        console.log('Service worker install Event!');
-        event.waitUntil(
-            caches.open(cacheName)
-                .then(cache => {
-                    return cache.addAll(resourcesToPrecache);
-                })
-        );
-    });
-
-    self.addEventListener('activate', event => {
-        console.log('Activate event!');
-    });
-
-    self.addEventListener('fetch', event => {
-        console.log('Fetch intercepted for:', event.request.url);
-        event.respondWith(caches.match(event.request)
-            .then(cachedResponse => {
-                return cachedResponse || fetch(event.request);
-            })
-        );
-    });
-    
-    ```
-
-## Manifest.json    
+inside main.js
 
 ```
 
+if(!('serviceWorker' in navigator)) {
+    console.log('Service Worker not supported');
+    return;
+}
+navigator.serviceWorker.register('/service-worker.js)
+    .then(function(registration){
+        console.log('SW registered! Scope is:'), registration.scope);
+    }); //.catch a registration error
+
+```
+        
+
+This should sit in the root js file to cover the scope of the whole app.
+
+inside sw.js
+
+
+```
+
+const cacheName = 'cache-v1';
+const resourcesToPrecache = [
+    '/',
+    'index.html'
+];
+
+self.addEventListener('install', event => {
+    console.log('Service worker install Event!');
+    event.waitUntil(
+        caches.open(cacheName)
+            .then(cache => {
+                return cache.addAll(resourcesToPrecache);
+            })
+    );
+});
+
+self.addEventListener('activate', event => {
+    console.log('Activate event!');
+});
+
+self.addEventListener('fetch', event => {
+    console.log('Fetch intercepted for:', event.request.url);
+    event.respondWith(caches.match(event.request)
+        .then(cachedResponse => {
+            return cachedResponse || fetch(event.request);
+        })
+    );
+});
+
+```
+
+## Manifest.json    
+```
 {
   "short_name": "PWA Notifications",
   "name": "Progressive Web App Notifications",
@@ -97,5 +105,5 @@ https://www.youtube.com/playlist?list=PLNYkxOF6rcIB2xHBZ7opgc2Mv009X87Hh
   "theme_color": "#1c05f3",
   "background_color": "#1c05f3"
 }
-
 ```
+
